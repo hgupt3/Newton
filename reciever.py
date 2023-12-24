@@ -4,7 +4,7 @@ from matplotlib.animation import FuncAnimation
 import csv
 
 # arduino connection intialization
-arduino = serial.Serial(port='/dev/cu.usbmodem101', baudrate=115200) 
+arduino = serial.Serial(port='/dev/cu.usbmodem1101', baudrate=115200) 
 
 # commented code finds arduino port address
 
@@ -16,10 +16,9 @@ arduino = serial.Serial(port='/dev/cu.usbmodem101', baudrate=115200)
 T,Ax,Ay,Az,Gx,Gy,Gz = [],[],[],[],[],[],[]
 
 # function for processing data from arduino
-def read_data():
+def read_data(): 
     line = arduino.readline().decode('utf-8').strip()
-    values = line.split(', ')
-    print(values)
+    values = line.split(',')
     T.append(float(values[0]))
     Ax.append(float(values[1]))
     Ay.append(float(values[2]))
@@ -33,7 +32,6 @@ def read_data():
 def update_plot(frame):
     read_data()
     plt.cla()
-    
     plt.plot(T, Ax, label='Ax')
     plt.plot(T, Ay, label='Ay')
     plt.plot(T, Az, label='Az')
