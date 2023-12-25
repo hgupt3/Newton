@@ -1,2 +1,2 @@
-#define SECRET_SSID ""
-#define SECRET_PASS ""
+#define SECRET_SSID "SMARTNET"
+#define SECRET_PASS "9873608114"

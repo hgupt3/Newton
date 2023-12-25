@@ -1,23 +1,20 @@
-import serial
+import socket
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import csv
 
-# arduino connection intialization
-arduino = serial.Serial(port='/dev/cu.usbmodem1101', baudrate=115200) 
-
-# commented code finds arduino port address
-
-# import serial.tools.list_ports
-# ports = serial.tools.list_ports.comports()
-# for port in ports: print(port)
+# network variables and intialization
+senderIP = "10.14.1.244"
+senderPort = 2390
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # socket creation
 
 # lists to store data
 T,Ax,Ay,Az,Gx,Gy,Gz = [],[],[],[],[],[],[]
 
 # function for processing data from arduino
 def read_data(): 
-    line = arduino.readline().decode('utf-8').strip()
+    data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
+    line = data.decode('utf-8').strip()
     values = line.split(',')
     T.append(float(values[0]))
     Ax.append(float(values[1]))
@@ -51,7 +48,7 @@ def save_data(event):
             writer.writerow([t,ax,ay,az,gx,gy,gz])
 
 # send reset char to arduino
-arduino.write(b'R') 
+sock.sendto(b'R', ("10.14.1.244", 2390))
 
 # configure plot
 fig, ax = plt.subplots()
