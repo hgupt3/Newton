@@ -12,6 +12,12 @@ using namespace std;
 #include <WiFiUdp.h>
 #include "network_info.h" // SSID and PASS
 
+// ARDUINO DEBUGGING INDICATORS: 
+// RED LIGHT           -> Not connected to WiFi
+// BLINKING RED LIGHT  -> Sensor Error
+// BLUE LIGHT          -> Awaiting signal from reciever
+// GREEN LIGHT         -> Transmitting packets to reciever
+
 // initialize sensor variables
 LSM6DS3 myIMU(I2C_MODE, 0x6A); 
 float aX, aY, aZ, gX, gY, gZ, time, start_time = 0;
@@ -33,7 +39,10 @@ void setup() {
   red(); // red color i.e. no internet
 
   Serial.begin(115200);
-  delay(1000); // wait for serial connection
+  // while(!Serial); // wait for serial connection
+  delay(1000); 
+  Serial.println(" ");
+  Serial.println(" ");
   Serial.println(" ");
   Serial.println(" ");
   

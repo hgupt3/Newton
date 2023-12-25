@@ -4,7 +4,7 @@ from matplotlib.animation import FuncAnimation
 import csv
 
 # network variables and intialization
-senderIP = "10.14.1.244"
+senderIP = "192.168.1.10" # change to that of arduino
 senderPort = 2390
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # socket creation
 
@@ -48,7 +48,7 @@ def save_data(event):
             writer.writerow([t,ax,ay,az,gx,gy,gz])
 
 # send reset char to arduino
-sock.sendto(b'R', ("10.14.1.244", 2390))
+sock.sendto(b'R', (senderIP, senderPort))
 
 # configure plot
 fig, ax = plt.subplots()
