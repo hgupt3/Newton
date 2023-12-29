@@ -1,3 +1,6 @@
+# this file recieves and decodes packets from the arduino. 
+# this data is saved to 'data.csv' with timestamps
+
 import socket
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
@@ -23,7 +26,6 @@ def read_data():
     Gx.append(float(values[4]))
     Gy.append(float(values[5]))
     Gz.append(float(values[6]))
-    # print(f'Time: {T[-1]}, Ax: {Ax[-1]}, Ay: {Ay[-1]}, Az: {Az[-1]}, Gx: {Gx[-1]}, Gy: {Gy[-1]}, Gz: {Gz[-1]}')
     
 # function to update plot
 def update_plot(frame):

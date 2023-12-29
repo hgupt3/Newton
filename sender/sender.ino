@@ -1,3 +1,6 @@
+// this file sets up the arduino's network and begins transmission 
+// to 'reciever.py' once an initialization/reset byte is recieved
+
 #include <string.h>
 using namespace std;
 
@@ -39,8 +42,8 @@ void setup() {
   red(); // red color i.e. no internet
 
   Serial.begin(115200);
+  // uncomment below for reliable serial connection
   // while(!Serial); // wait for serial connection
-  delay(1000); 
   Serial.println(" ");
   Serial.println(" ");
   Serial.println(" ");
