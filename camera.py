@@ -143,10 +143,6 @@ def process_data(unprocessed_landmarks):
         landmarks = np.zeros((21,3))
         for idx in range(len(unprocessed_landmarks)): # put x y z in an easily mutable array
             landmarks[idx,:] = unprocessed_landmarks[idx].x, unprocessed_landmarks[idx].y, unprocessed_landmarks[idx].z
-            
-        # make the wrist the origin 
-        origin_offset = landmarks[0]
-        landmarks = landmarks - origin_offset
     finally: return landmarks
 
 # show hand landmark plot    
