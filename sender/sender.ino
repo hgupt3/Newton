@@ -4,8 +4,9 @@
 #include <string.h>
 using namespace std;
 
-// sensor libraries
+// component libraries
 #include <LSM6DS3.h>
+#include "TCA9548A.h"
 #include <Wire.h>
 
 // network libraries
@@ -15,15 +16,20 @@ using namespace std;
 #include <WiFiUdp.h>
 #include "network_info.h" // SSID and PASS
 
+
 // ARDUINO DEBUGGING INDICATORS: 
 // RED LIGHT           -> Not connected to WiFi
 // BLINKING RED LIGHT  -> Sensor Error
 // BLUE LIGHT          -> Awaiting signal from reciever
 // GREEN LIGHT         -> Transmitting packets to reciever
 
-// initialize sensor variables
+// initialize component variables
+TCA9548A<TwoWire> TCA;
 LSM6DS3 myIMU(I2C_MODE, 0x6A); 
 float aX, aY, aZ, gX, gY, gZ, time, start_time = 0;
+int channel_ = -1; // specifices which channel is currently open on MUX/TCA
+
+// TCA CHANNEL 0 AND 1 MANIPULATION CAUSES NETWORK MODULE TO DISCONNECT RANDOMLY DURING SKETCH
 
 // initialize network variables
 int status = WL_IDLE_STATUS;
@@ -44,20 +50,22 @@ void setup() {
   Serial.begin(115200);
   // uncomment below for reliable serial connection
   // while(!Serial); // wait for serial connection
-  Serial.println(" ");
-  Serial.println(" ");
-  Serial.println(" ");
-  Serial.println(" ");
+
+  TCA.begin(Wire); // begin communication to I2C multplexer
   
-  if (myIMU.begin() != 0) {
-    Serial.println("Sensor error");
-    while (myIMU.begin() != 0) { // blinking red light indicating sensor error
-      blank();
-      delay(1000);
-      red();
-      delay(1000);
-    }
-  } //.begin() to configure the IMU
+  for (int idx = 2; idx < 7; idx++){ // iterate through all channels
+    channel(idx);
+    if (myIMU.begin() != 0) { //.begin() to configure the IMU
+      Serial.println("Sensor error");
+      while (myIMU.begin() != 0) { // blinking red light indicating sensor error
+        blank();
+        delay(1000);
+        red();
+        delay(1000);
+      }
+    } 
+  }
+
   network_intilization(); // configure the network
 
   green(); // green color i.e. data communication
@@ -68,11 +76,18 @@ void setup() {
 }
 
 void loop() {
+  if (WiFi.status() != WL_CONNECTED) {
+    red();
+    Serial.println("Communication with WiFi failed");
+    while (true); // don't continue
+  }
+
   if (check_UDP() && packetBuffer[0] == 'R') {  // check for reset signal
     recieverIP = Udp.remoteIP();  // remember for communication
     recieverPort = Udp.remotePort();
     start_time = micros()/ 1e6;
   }
+
   send_data(); // send data through UDP
   delay(100); // every 100ms
 }
@@ -151,17 +166,22 @@ bool check_UDP() {
 
 // function to send data through UDP 
 void send_data() {
-  time = (micros() / 1e6) - start_time; // time relative to reset signal time
+  String msg = "";
 
-  // read data from sensor
-  aX = myIMU.readFloatAccelX();
-  aY = myIMU.readFloatAccelY();
-  aZ = myIMU.readFloatAccelZ();
-  gX = myIMU.readFloatGyroX();
-  gY = myIMU.readFloatGyroY();
-  gZ = myIMU.readFloatGyroZ();
-  
-  String msg = String(time)+","+String(aX)+","+String(aY)+","+String(aZ)+","+String(gX)+","+String(gY)+","+String(gZ);
+  // iterate through all channels
+  for (int idx = 2; idx < 7; idx++) {
+    channel(idx);
+    // read data from sensor
+    time = (micros() / 1e6) - start_time; // time relative to reset signal time
+    aX = myIMU.readFloatAccelX();
+    aY = myIMU.readFloatAccelY();
+    aZ = myIMU.readFloatAccelZ();
+    gX = myIMU.readFloatGyroX();
+    gY = myIMU.readFloatGyroY();
+    gZ = myIMU.readFloatGyroZ();
+    if (msg=="") {msg = String(time)+","+String(aX)+","+String(aY)+","+String(aZ)+","+String(gX)+","+String(gY)+","+String(gZ);}
+    else {msg = msg+","+String(time)+","+String(aX)+","+String(aY)+","+String(aZ)+","+String(gX)+","+String(gY)+","+String(gZ);}
+  }
 
   // send packet
   Udp.beginPacket(recieverIP, recieverPort);
@@ -170,6 +190,31 @@ void send_data() {
 
   Serial.print("Sent packet at ");
   Serial.println(time);
+}
+
+// function to change I2C bus channel
+void channel(unsigned int num){
+  // close current channel
+  if (channel_ == 0) TCA.closeChannel(TCA_CHANNEL_0);
+  if (channel_ == 1) TCA.closeChannel(TCA_CHANNEL_1);
+  if (channel_ == 2) TCA.closeChannel(TCA_CHANNEL_2);
+  if (channel_ == 3) TCA.closeChannel(TCA_CHANNEL_3);
+  if (channel_ == 4) TCA.closeChannel(TCA_CHANNEL_4);
+  if (channel_ == 5) TCA.closeChannel(TCA_CHANNEL_5);
+  if (channel_ == 6) TCA.closeChannel(TCA_CHANNEL_6);
+  if (channel_ == 7) TCA.closeChannel(TCA_CHANNEL_7);
+  
+  // open channel specified
+  if (num == 0) TCA.openChannel(TCA_CHANNEL_0);
+  if (num == 1) TCA.openChannel(TCA_CHANNEL_1);
+  if (num == 2) TCA.openChannel(TCA_CHANNEL_2);
+  if (num == 3) TCA.openChannel(TCA_CHANNEL_3);
+  if (num == 4) TCA.openChannel(TCA_CHANNEL_4);
+  if (num == 5) TCA.openChannel(TCA_CHANNEL_5);
+  if (num == 6) TCA.openChannel(TCA_CHANNEL_6);
+  if (num == 7) TCA.openChannel(TCA_CHANNEL_7);
+
+  channel_ = num; // remember opened channel
 }
 
 // toggle pin color functions

@@ -5,55 +5,79 @@ import socket
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import csv
+import numpy as np
+import time
 
-# network variables and intialization
-senderIP = "192.168.1.10" # change to that of arduino
-senderPort = 2390
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # socket creation
-
-# lists to store data
-T,Ax,Ay,Az,Gx,Gy,Gz = [],[],[],[],[],[],[]
-
-# function for processing data from arduino
-def read_data(): 
-    data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
-    line = data.decode('utf-8').strip()
-    values = line.split(',')
-    T.append(float(values[0]))
-    Ax.append(float(values[1]))
-    Ay.append(float(values[2]))
-    Az.append(float(values[3]))
-    Gx.append(float(values[4]))
-    Gy.append(float(values[5]))
-    Gz.append(float(values[6]))
+class reciever():
+    def __init__(self):
+        # network variables and intialization
+        self.senderIP = "192.168.1.10" # change to that of arduino
+        self.senderPort = 2390
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # socket creation
+        self.sock.settimeout(3) # after 3 seconds timeout
+        self.start_time = 0
+        
+        # lists to store data
+        self.data = []
+        
+        # create plot
+        self.fig, self.ax = plt.subplots()
+        
+        self.begin_reciever()
+        
+    # function to start reciever functions
+    def begin_reciever(self):
+        # send reset char to arduino
+        self.sock.sendto(b'R', (self.senderIP, self.senderPort))
+        self.start_time = time.time()
+        # configure plot
+        self.fig.canvas.mpl_connect('close_event', self.close) # close function once plot closed
+        ani = FuncAnimation(self.fig, self.update_plot, interval=10, cache_frame_data=False)
+        plt.show()
     
-# function to update plot
-def update_plot(frame):
-    read_data()
-    plt.cla()
-    plt.plot(T, Ax, label='Ax')
-    plt.plot(T, Ay, label='Ay')
-    plt.plot(T, Az, label='Az')
-    plt.plot(T, Gx, label='Gx')
-    plt.plot(T, Gy, label='Gy')
-    plt.plot(T, Gz, label='Gz')
-    plt.xlabel('Time')
-    plt.ylabel('Sensor Values')
-    plt.legend()
+    # function for processing data from arduino
+    def read_data(self): 
+        try: recieved, addr = self.sock.recvfrom(1024) # buffer size is 1024 bytes
+        except: self.close('Packet timeout')
+        line = recieved.decode('utf-8').strip()
+        values = line.split(',')
+        for idx in range(len(values)):
+            try: self.data[idx].append(values[idx])
+            except: self.data.append([values[idx]])
     
-# function to save data to csv
-def save_data(event):
-    with open('data.csv', 'w', newline='') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(['Time','Ax','Ay','Az','Gx','Gy','Gz'])
-        for t,ax,ay,az,gx,gy,gz in zip(T,Ax,Ay,Az,Gx,Gy,Gz):
-            writer.writerow([t,ax,ay,az,gx,gy,gz])
-
-# send reset char to arduino
-sock.sendto(b'R', (senderIP, senderPort))
-
-# configure plot
-fig, ax = plt.subplots()
-fig.canvas.mpl_connect('close_event', save_data) # save data once plot is closed
-ani = FuncAnimation(fig, update_plot, interval=10)
-plt.show()
+    # function to update plot
+    def update_plot(self, frame):
+        self.read_data()
+        
+        plt.cla()
+        # plt.plot(self.data[0], self.data[1], label='Ax')
+        # plt.plot(self.data[0], self.data[2], label='Ay')
+        # plt.plot(self.data[0], self.data[3], label='Az')
+        # plt.plot(self.data[0], self.data[4], label='Gx')
+        # plt.plot(self.data[0], self.data[5], label='Gy')
+        # plt.plot(self.data[0], self.data[6], label='Gz')
+        # plt.xlabel('Time')
+        # plt.ylabel('Sensor Values')
+        # plt.legend()
+            
+    
+    # function to save data to csv
+    def save_data(self):
+        self.data = np.array(self.data)
+        with open('data.csv', 'w', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(['T1','Ax1','Ay1','Az1','Gx1','Gy1','Gz1',
+                             'T2','Ax2','Ay2','Az2','Gx2','Gy2','Gz2',
+                             'T3','Ax3','Ay3','Az3','Gx3','Gy3','Gz3',
+                             'T4','Ax4','Ay4','Az4','Gx4','Gy4','Gz4',
+                             'T5','Ax5','Ay5','Az5','Gx5','Gy5','Gz5'])
+            for idx in range(self.data.shape[1]):
+                writer.writerow(self.data[:,idx])
+                
+    def close(self, event):
+        plt.close()
+        self.sock.close()
+        self.save_data()
+         
+# run class   
+reciever()
