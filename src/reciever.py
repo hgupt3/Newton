@@ -21,8 +21,8 @@ class reciever():
         self.data = []
         
         # create plot
-        self.fig, self.ax = plt.subplots()
-        
+        self.fig, self.ax = plt.subplots(1, 5) 
+        self.ani = FuncAnimation(self.fig, self.update_plot, interval=100, cache_frame_data=False)
         self.begin_reciever()
         
     # function to start reciever functions
@@ -32,7 +32,7 @@ class reciever():
         self.start_time = time.time()
         # configure plot
         self.fig.canvas.mpl_connect('close_event', self.close) # close function once plot closed
-        ani = FuncAnimation(self.fig, self.update_plot, interval=10, cache_frame_data=False)
+        self.fig.canvas.manager.set_window_title('Accelerometer Plot')
         plt.show()
     
     # function for processing data from arduino
@@ -42,29 +42,25 @@ class reciever():
         line = recieved.decode('utf-8').strip()
         values = line.split(',')
         for idx in range(len(values)):
-            try: self.data[idx].append(values[idx])
-            except: self.data.append([values[idx]])
+            try: self.data[idx].append(float(values[idx]))
+            except: self.data.append([float(values[idx])])
     
     # function to update plot
     def update_plot(self, frame):
         self.read_data()
-        
-        plt.cla()
-        # plt.plot(self.data[0], self.data[1], label='Ax')
-        # plt.plot(self.data[0], self.data[2], label='Ay')
-        # plt.plot(self.data[0], self.data[3], label='Az')
-        # plt.plot(self.data[0], self.data[4], label='Gx')
-        # plt.plot(self.data[0], self.data[5], label='Gy')
-        # plt.plot(self.data[0], self.data[6], label='Gz')
-        # plt.xlabel('Time')
-        # plt.ylabel('Sensor Values')
-        # plt.legend()
-            
+        for idx in range(len(self.data) // 7):
+            self.ax[idx].cla()
+            self.ax[idx].set_ylim(-2, 2)
+            self.ax[idx].set_xticks([])
+            self.ax[idx].set_yticks([])
+            self.ax[idx].plot(self.data[7*idx][-20:], self.data[1+7*idx][-20:], label='Ax')
+            self.ax[idx].plot(self.data[7*idx][-20:], self.data[2+7*idx][-20:], label='Ay')
+            self.ax[idx].plot(self.data[7*idx][-20:], self.data[3+7*idx][-20:], label='Az')
     
     # function to save data to csv
     def save_data(self):
         self.data = np.array(self.data)
-        with open('data.csv', 'w', newline='') as csvfile:
+        with open('data_reciever.csv', 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(['T1','Ax1','Ay1','Az1','Gx1','Gy1','Gz1',
                              'T2','Ax2','Ay2','Az2','Gx2','Gy2','Gz2',

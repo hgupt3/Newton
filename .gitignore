@@ -1,5 +1,6 @@
 # User-defined
-data.csv
+data_reciever.csv
+data_camera.csv
 sender/network_info.h
 
 # Byte-compiled / optimized / DLL files

@@ -7,11 +7,9 @@ import mediapipe as mp
 from mediapipe import solutions
 from mediapipe.framework.formats import landmark_pb2
 import numpy as np
-from mediapipe.tasks import python
-from mediapipe.tasks.python import vision
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-from mpl_toolkits.mplot3d import Axes3D
+import csv
 
 # hand landmarker class to output landmarks
 # more details at https://developers.google.com/mediapipe/solutions/vision/hand_landmarker/python#live-stream
@@ -26,9 +24,9 @@ class hand_landmarker():
         # callback function
         def update_result(result: mp.tasks.vision.HandLandmarkerResult, output_image: mp.Image, timestamp_ms: int):
             self.result = result
-            
+          
         options = mp.tasks.vision.HandLandmarkerOptions( 
-         base_options = mp.tasks.BaseOptions(model_asset_path="hand_landmarker/hand_landmarker.task"), # path to model
+         base_options = mp.tasks.BaseOptions(model_asset_path="./mp_model/hand_landmarker.task"), # path to model
          running_mode = mp.tasks.vision.RunningMode.LIVE_STREAM, # running on a live stream
          result_callback=update_result)
         self.landmarker = self.landmarker.create_from_options(options)
@@ -45,16 +43,21 @@ class hand_plot():
     def __init__(self):
         self.landmarker = hand_landmarker() # create hand landmarker instance
         self.feed = cv2.VideoCapture(0) # try 0 or 1 if you get an error
+        self.frame, self.ret = None, None
+        self.data = []
+        
         self.fig = plt.figure()
-        self.ax = self.fig.add_subplot(111, projection='3d') # create 3D figure
-        self.create_plot()  
+        self.ax = self.fig.add_subplot(111, projection='3d') # create 3D figure 
+        self.ani = FuncAnimation(self.fig, self.update_plot, interval=10, cache_frame_data=False)
+        
+        self.create_plot()
     
     # plot configuration
     def create_plot(self):
         self.feed.isOpened()
         self.fig.canvas.manager.set_window_title('Hand Landmark Plot')
         self.fig.canvas.mpl_connect('close_event', self.close) # call close if plot is closed
-        ani = FuncAnimation(self.fig, self.update_plot, interval=10)
+        self.start_time = time.time()
         plt.show()
         
     # update plot function which reads frame and displays landmarks
@@ -71,14 +74,15 @@ class hand_plot():
         self.ax.set_zticklabels([])
         self.ax.view_init(elev=-90, azim=270)
         
-        ret, frame = self.feed.read() # read and display frame
+        self.ret, frame = self.feed.read() # read and display frame
         self.landmarker.detect_async(frame) # detect landmarks
         landmarks = self.landmarker.result
         
-        drawn_frame = draw_landmarks(frame, landmarks) 
-        cv2.imshow('Camera',drawn_frame) 
+        self.frame = draw_landmarks(frame, landmarks) 
+        cv2.imshow('Camera',self.frame) 
         landmarks = process_data(landmarks)
         if not len(landmarks): return # if no hands/landmarks found return
+        self.data.append(np.append([time.time()-self.start_time], landmarks))
         
         # landmarks in order of their corresponding bodies
         palm_idx = {0, 17, 13, 9, 5, 0, 1}
@@ -104,8 +108,6 @@ class hand_plot():
         ring = np.array([landmarks[13], landmarks[14], landmarks[15], landmarks[16]])
         pinky = np.array([landmarks[17], landmarks[18], landmarks[19], landmarks[20]])
         
-        # print(np.linalg.norm(landmarks[0] - landmarks[5]))
-        
         # displayed with colors
         self.ax.plot(palm[:,0], palm[:,1], palm[:,2], color='grey')
         self.ax.plot(thumb[:,0], thumb[:,1], thumb[:,2], color='bisque')
@@ -113,12 +115,24 @@ class hand_plot():
         self.ax.plot(middle[:,0], middle[:,1], middle[:,2], color='gold')
         self.ax.plot(ring[:,0], ring[:,1], ring[:,2], color='chartreuse')
         self.ax.plot(pinky[:,0], pinky[:,1], pinky[:,2], color='royalblue')
+        
+    def save_data(self):
+        with open('data_camera.csv', 'w', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(['T',
+                             '0x','0y','0z','1x','1y','1z','2x','2y','2z','3x','3y','3z','4x','4y','4z',
+                             '5x','5y','5z','6x','6y','6z','7x','7y','7z','8x','8y','8z','9x','9y','9z',
+                             '10x','10y','10z','11x','11y','11z','12x','12y','12z','13x','13y','13z',
+                             '14x','14y','14z','15x','15y','15z','16x','16y','16z','17x','17y','17z',
+                             '18x','18y','18z','19x','19y','19z','20x','20y','20z'])
+            for idx in range(len(self.data)):
+                writer.writerow(np.around(self.data[idx],4))
             
     # closes all instances
     def close(self, event):
         self.feed.release()
-        cv2.destroyAllWindows()
         plt.close()
+        self.save_data()
       
 # adapted from https://github.com/googlesamples/mediapipe/blob/main/examples/hand_landmarker/python/hand_landmarker.ipynb 
 def draw_landmarks(image, landmarks):
@@ -147,4 +161,3 @@ def process_data(unprocessed_landmarks):
 
 # show hand landmark plot    
 hand_plot()
-
