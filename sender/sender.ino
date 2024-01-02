@@ -53,7 +53,7 @@ void setup() {
 
   TCA.begin(Wire); // begin communication to I2C multplexer
   
-  for (int idx = 2; idx < 7; idx++){ // iterate through all channels
+  for (int idx = 3; idx < 8; idx++){ // iterate through all channels
     channel(idx);
     if (myIMU.begin() != 0) { //.begin() to configure the IMU
       Serial.println("Sensor error");
@@ -169,7 +169,7 @@ void send_data() {
   String msg = "";
 
   // iterate through all channels
-  for (int idx = 2; idx < 7; idx++) {
+  for (int idx = 3; idx < 8; idx++) {
     channel(idx);
     // read data from sensor
     time = (micros() / 1e6) - start_time; // time relative to reset signal time
