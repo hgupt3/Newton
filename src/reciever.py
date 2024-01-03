@@ -60,7 +60,7 @@ class reciever():
     # function to save data to csv
     def save_data(self):
         self.data = np.array(self.data)
-        with open('data_reciever.csv', 'w', newline='') as csvfile:
+        with open('data/data_reciever.csv', 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(['T1','Ax1','Ay1','Az1','Gx1','Gy1','Gz1',
                              'T2','Ax2','Ay2','Az2','Gx2','Gy2','Gz2',

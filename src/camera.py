@@ -55,6 +55,7 @@ class hand_plot():
     # plot configuration
     def create_plot(self):
         self.feed.isOpened()
+        
         self.fig.canvas.manager.set_window_title('Hand Landmark Plot')
         self.fig.canvas.mpl_connect('close_event', self.close) # call close if plot is closed
         self.start_time = time.time()
@@ -74,12 +75,17 @@ class hand_plot():
         self.ax.set_zticklabels([])
         self.ax.view_init(elev=-90, azim=270)
         
-        self.ret, frame = self.feed.read() # read and display frame
-        self.landmarker.detect_async(frame) # detect landmarks
+        self.ret, unprocessed_frame = self.feed.read() # read and display frame
+        self.landmarker.detect_async(unprocessed_frame) # detect landmarks
         landmarks = self.landmarker.result
         
-        self.frame = draw_landmarks(frame, landmarks) 
-        cv2.imshow('Camera',self.frame) 
+        self.frame = draw_landmarks(unprocessed_frame, landmarks) 
+        
+        cv2.imshow('Camera', self.frame)
+        cv2.namedWindow("Camera", cv2.WINDOW_NORMAL) 
+        cv2.resizeWindow("Camera", 900, 500)
+        if cv2.waitKey(1) in {ord("q"), ord("Q")}: self.close('close_event')
+        
         landmarks = process_data(landmarks)
         if not len(landmarks): return # if no hands/landmarks found return
         self.data.append(np.append([time.time()-self.start_time], landmarks))
@@ -117,7 +123,7 @@ class hand_plot():
         self.ax.plot(pinky[:,0], pinky[:,1], pinky[:,2], color='royalblue')
         
     def save_data(self):
-        with open('data_camera.csv', 'w', newline='') as csvfile:
+        with open('data/data_camera.csv', 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(['T',
                              '0x','0y','0z','1x','1y','1z','2x','2y','2z','3x','3y','3z','4x','4y','4z',
