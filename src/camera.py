@@ -39,16 +39,18 @@ class hand_landmarker():
       self.landmarker.close()
     
 class camera():
-    def __init__(self):
+    def __init__(self, time_):
         self.landmarker = hand_landmarker() # create hand landmarker instance
         self.frame, self.ret = None, None
         self.data = []
+        
+        self.time = time_ + time.time()
         
     def run(self):
         self.feed = cv2.VideoCapture(0) # try 0 or 1 if you get an error
         self.feed.isOpened()
         
-        while True:
+        while self.time > time.time():
             self.update()
         
     # update plot function which reads frame and displays landmarks
@@ -87,7 +89,7 @@ class camera():
                 writer.writerow(np.around(self.data[idx],2))
             
     # closes all instances
-    def close(self, event):
+    def close(self):
         self.feed.release()
         self.save_data()
       
@@ -117,5 +119,6 @@ def process_data(unprocessed_landmarks):
     finally: return landmarks
 
 # show camera    
-cam = camera()
+cam = camera(10)
 cam.run()
+cam.close()

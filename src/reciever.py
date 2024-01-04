@@ -8,7 +8,7 @@ import time
 import os
 
 class reciever():
-    def __init__(self):
+    def __init__(self, time_):
         # network variables and intialization
         self.senderIP = "192.168.1.10" # change to that of arduino
         self.senderPort = 2390
@@ -16,10 +16,13 @@ class reciever():
         self.sock.settimeout(3) # after 3 seconds timeout
         self.data = []
         
+        self.time = time_ + time.time()
+        
     def run(self):
         # send time info to arduino
-        self.sock.sendto(bytes(f'{time.time()}', 'utf-8'), (self.senderIP, self.senderPort)) 
-        while True:
+        self.sock.sendto(bytes(f'{time.time()}', 'utf-8'), (self.senderIP, self.senderPort))
+         
+        while self.time > time.time():
             self.read_data()
     
     # function for processing data from arduino
@@ -50,11 +53,11 @@ class reciever():
             for idx in range(self.data.shape[1]):
                 writer.writerow(self.data[:,idx])
                 
-    def close(self, event):
+    def close(self):
         self.sock.close()
         self.save_data()
          
 # run class   
-rec = reciever()
+rec = reciever(10)
 rec.run()
-
+rec.close()
