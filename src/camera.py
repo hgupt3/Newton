@@ -7,9 +7,8 @@ import mediapipe as mp
 from mediapipe import solutions
 from mediapipe.framework.formats import landmark_pb2
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
 import csv
+import os
 
 # hand landmarker class to output landmarks
 # more details at https://developers.google.com/mediapipe/solutions/vision/hand_landmarker/python#live-stream
@@ -71,7 +70,12 @@ class camera():
         if len(landmarks): self.data.append(np.append([time.time()], landmarks))
         
     def save_data(self):
-        with open('data/data_camera.csv', 'w', newline='') as csvfile:
+        # check for file name
+        idx = 1
+        while os.path.exists(f'data/camera{idx}.csv'): idx += 1
+        
+        # write data to file
+        with open(f'data/camera{idx}.csv', 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(['T',
                              '0x','0y','0z','1x','1y','1z','2x','2y','2z','3x','3y','3z','4x','4y','4z',

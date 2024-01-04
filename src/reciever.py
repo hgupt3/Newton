@@ -2,11 +2,10 @@
 # this data is saved to 'data.csv' with timestamps
 
 import socket
-import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
 import csv
 import numpy as np
 import time
+import os
 
 class reciever():
     def __init__(self):
@@ -35,8 +34,12 @@ class reciever():
     
     # function to save data to csv
     def save_data(self):
+        # check for file name
+        idx = 1
+        while os.path.exists(f'data/reciever{idx}.csv'): idx += 1
+        
         self.data = np.array(self.data)
-        with open('data/data_reciever.csv', 'w', newline='') as csvfile:
+        with open(f'data/reciever{idx}.csv', 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(['T',
                              'Ax1','Ay1','Az1','Gx1','Gy1','Gz1',
