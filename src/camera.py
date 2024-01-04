@@ -39,42 +39,21 @@ class hand_landmarker():
     def close(self):
       self.landmarker.close()
     
-class hand_plot():
+class camera():
     def __init__(self):
         self.landmarker = hand_landmarker() # create hand landmarker instance
-        self.feed = cv2.VideoCapture(0) # try 0 or 1 if you get an error
         self.frame, self.ret = None, None
         self.data = []
         
-        self.fig = plt.figure()
-        self.ax = self.fig.add_subplot(111, projection='3d') # create 3D figure 
-        self.ani = FuncAnimation(self.fig, self.update_plot, interval=10, cache_frame_data=False)
-        
-        self.create_plot()
-    
-    # plot configuration
-    def create_plot(self):
+    def run(self):
+        self.feed = cv2.VideoCapture(0) # try 0 or 1 if you get an error
         self.feed.isOpened()
         
-        self.fig.canvas.manager.set_window_title('Hand Landmark Plot')
-        self.fig.canvas.mpl_connect('close_event', self.close) # call close if plot is closed
-        self.start_time = time.time()
-        plt.show()
+        while True:
+            self.update()
         
     # update plot function which reads frame and displays landmarks
-    def update_plot(self, num):         
-        # clear axes and set new ones
-        plt.cla() 
-        self.ax.set_box_aspect((1, 1, 0.6), zoom = 1.6) # aspect ratio of graph
-        self.ax.set_xlabel("x")
-        self.ax.set_ylabel("y")
-        self.ax.set_zlabel("z")
-        self.ax.set_xlim3d(-0.2, 0.2)
-        self.ax.set_ylim3d(-0.2, 0.2)
-        self.ax.set_zlim3d(-0.1, 0.1)
-        self.ax.set_zticklabels([])
-        self.ax.view_init(elev=-90, azim=270)
-        
+    def update(self):        
         self.ret, unprocessed_frame = self.feed.read() # read and display frame
         self.landmarker.detect_async(unprocessed_frame) # detect landmarks
         landmarks = self.landmarker.result
@@ -86,41 +65,10 @@ class hand_plot():
         cv2.resizeWindow("Camera", 900, 500)
         if cv2.waitKey(1) in {ord("q"), ord("Q")}: self.close('close_event')
         
-        landmarks = process_data(landmarks)
-        if not len(landmarks): return # if no hands/landmarks found return
-        self.data.append(np.append([time.time()-self.start_time], landmarks))
+        landmarks = process_data(landmarks) * 100
         
-        # landmarks in order of their corresponding bodies
-        palm_idx = {0, 17, 13, 9, 5, 0, 1}
-        thumb_idx = {2, 3, 4}
-        index_idx = {6, 7, 8}
-        middle_idx = {10, 11, 12}
-        ring_idx = {14, 15, 16}
-        pinky_idx = {18, 19, 20}
-        
-        for idx in range(len(landmarks)): # print all landmarks 
-            if idx in palm_idx: self.ax.scatter(landmarks[idx][0], landmarks[idx][1], landmarks[idx][2], color='red', edgecolors='white')
-            if idx in thumb_idx: self.ax.scatter(landmarks[idx][0], landmarks[idx][1], landmarks[idx][2], color='bisque', edgecolors='white')
-            if idx in index_idx: self.ax.scatter(landmarks[idx][0], landmarks[idx][1], landmarks[idx][2], color='purple', edgecolors='white')
-            if idx in middle_idx: self.ax.scatter(landmarks[idx][0], landmarks[idx][1], landmarks[idx][2], color='gold', edgecolors='white')
-            if idx in ring_idx: self.ax.scatter(landmarks[idx][0], landmarks[idx][1], landmarks[idx][2], color='chartreuse', edgecolors='white')
-            if idx in pinky_idx: self.ax.scatter(landmarks[idx][0], landmarks[idx][1], landmarks[idx][2], color='royalblue', edgecolors='white')
-        
-        # create line connections between relevant landmarks
-        palm = np.array([landmarks[0], landmarks[17], landmarks[13], landmarks[9], landmarks[5], landmarks[0], landmarks[1]])
-        thumb = np.array([landmarks[1], landmarks[2], landmarks[3], landmarks[4]])
-        index = np.array([landmarks[5], landmarks[6], landmarks[7], landmarks[8]])
-        middle = np.array([landmarks[9], landmarks[10], landmarks[11], landmarks[12]])
-        ring = np.array([landmarks[13], landmarks[14], landmarks[15], landmarks[16]])
-        pinky = np.array([landmarks[17], landmarks[18], landmarks[19], landmarks[20]])
-        
-        # displayed with colors
-        self.ax.plot(palm[:,0], palm[:,1], palm[:,2], color='grey')
-        self.ax.plot(thumb[:,0], thumb[:,1], thumb[:,2], color='bisque')
-        self.ax.plot(index[:,0], index[:,1], index[:,2], color='purple')
-        self.ax.plot(middle[:,0], middle[:,1], middle[:,2], color='gold')
-        self.ax.plot(ring[:,0], ring[:,1], ring[:,2], color='chartreuse')
-        self.ax.plot(pinky[:,0], pinky[:,1], pinky[:,2], color='royalblue')
+        # if landmarks found then append
+        if len(landmarks): self.data.append(np.append([time.time()], landmarks))
         
     def save_data(self):
         with open('data/data_camera.csv', 'w', newline='') as csvfile:
@@ -132,12 +80,11 @@ class hand_plot():
                              '14x','14y','14z','15x','15y','15z','16x','16y','16z','17x','17y','17z',
                              '18x','18y','18z','19x','19y','19z','20x','20y','20z'])
             for idx in range(len(self.data)):
-                writer.writerow(np.around(self.data[idx],4))
+                writer.writerow(np.around(self.data[idx],2))
             
     # closes all instances
     def close(self, event):
         self.feed.release()
-        plt.close()
         self.save_data()
       
 # adapted from https://github.com/googlesamples/mediapipe/blob/main/examples/hand_landmarker/python/hand_landmarker.ipynb 
@@ -165,5 +112,6 @@ def process_data(unprocessed_landmarks):
             landmarks[idx,:] = unprocessed_landmarks[idx].x, unprocessed_landmarks[idx].y, unprocessed_landmarks[idx].z
     finally: return landmarks
 
-# show hand landmark plot    
-hand_plot()
+# show camera    
+cam = camera()
+cam.run()
