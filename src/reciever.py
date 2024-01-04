@@ -6,6 +6,7 @@ import csv
 import numpy as np
 import time
 import os
+import sys
 
 class reciever():
     def __init__(self, time_):
@@ -58,6 +59,6 @@ class reciever():
         self.save_data()
          
 # run class   
-rec = reciever(10)
+rec = reciever(int(sys.argv[1]))
 rec.run()
 rec.close()

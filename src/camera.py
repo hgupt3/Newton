@@ -9,6 +9,7 @@ from mediapipe.framework.formats import landmark_pb2
 import numpy as np
 import csv
 import os
+import sys
 
 # hand landmarker class to output landmarks
 # more details at https://developers.google.com/mediapipe/solutions/vision/hand_landmarker/python#live-stream
@@ -119,6 +120,6 @@ def process_data(unprocessed_landmarks):
     finally: return landmarks
 
 # show camera    
-cam = camera(10)
+cam = camera(int(sys.argv[1]))
 cam.run()
 cam.close()
