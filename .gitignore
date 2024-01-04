@@ -1,6 +1,5 @@
 # User-defined
 data
-src/sender/network_info.h
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
