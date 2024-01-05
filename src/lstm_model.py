@@ -6,6 +6,7 @@ import sklearn.preprocessing
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
+import plot
 
 # count number of processed files to parse
 datasets = []
@@ -28,9 +29,13 @@ random.shuffle(datasets)
 merged_df = pd.concat(datasets)
 
 # apply scaling
-ss = sklearn.preprocessing.StandardScaler()
-np_df = ss.fit_transform(merged_df)
-merged_df.iloc[:,:] = np_df
+ss_input = sklearn.preprocessing.StandardScaler()
+ss_output = sklearn.preprocessing.StandardScaler()
+
+np_df = ss_input.fit_transform(merged_df.iloc[:,:30])
+merged_df.iloc[:,:30] = np_df
+np_df = ss_output.fit_transform(merged_df.iloc[:,30:])
+merged_df.iloc[:,30:] = np_df
 
 # revert back to original datasets
 for idx, df in enumerate(datasets):
@@ -98,12 +103,13 @@ model = hand_lstm()
 
 # model evaluation parameters
 learning_rate = 0.001
-num_epoch = 2000
+num_epoch = 10
         
 criterion = torch.nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
 # model training
+print("Model training:")
 for epoch in range(num_epoch+1):
     model.train()
     optimizer.zero_grad()
@@ -112,8 +118,17 @@ for epoch in range(num_epoch+1):
     loss.backward()
     optimizer.step()
     
-    if not (epoch % (num_epoch//10)): 
-        model.eval()
-        output_pred = model(input_train_tensors)
-        loss = criterion(output_pred, output_train_tensors)
-        print(f"epoch: {epoch}, loss: {round(loss.item(),5)}")
+    # if not (epoch % (num_epoch//100)): 
+    model.eval()
+    output_pred = model(input_train_tensors)
+    loss = criterion(output_pred, output_train_tensors)
+    print(f"epoch: {epoch}, loss: {round(loss.item(),5)}")        
+
+out_pred = model(input_test_tensors)
+loss = criterion(output_pred, output_test_tensors)
+print(f"loss on testing data: {round(loss.item(),5)}")
+
+# save model weights
+if input("Do you want to save weights? ( y / n )\n") in {'y', 'Y'}:
+    torch.save(model.state_dict(), 'newton_model/weights.pth')
+    print(("Saved weights at 'newton_model/weights.pth'"))
