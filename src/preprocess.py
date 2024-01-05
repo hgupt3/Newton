@@ -3,7 +3,7 @@ import numpy as np
 from plot import hand_plot
 import os
 
-class data():    
+class data_format():    
     # apply all techniques to get concatated table
     def process(self, df1, df2, interval, roll_over1, roll_over2):
         df1 = self.format_data(df1)
@@ -52,6 +52,7 @@ class data():
         df.to_csv(f"data/processed{idx}.csv")
         return df
         
+data_f = data_format()   
 idx = 1        
 while os.path.exists(f'data/reciever{idx}.csv'): 
     
@@ -60,14 +61,15 @@ while os.path.exists(f'data/reciever{idx}.csv'):
     dc = pd.read_csv(f'data/camera{idx}.csv')    
     
     # do the processing and create files
-    dp = data().process(dr, dc, 100, 1, 5)
+    dp = data_f.process(dr, dc, 100, 1, 5)
     idx += 1
         
 # uncomment below to display processed handplot for certain read
-# dc = pd.read_csv(f'data/camera1.csv')    
-# dc = data.format_data(dc)
-# dc = data.rolling_sum(dc, 5)
-# dc = data.extrapolate_interval(dc, 100)
+# dc = pd.read_csv(f'data/camera1.csv') 
+# dc = data_f.format_data(dc)
+# dc = data_f.rolling_sum(dc, 5)
+# dc = data_f.extrapolate_interval(dc, 100)
+# dc = dc.to_numpy()
 
 # hp = hand_plot(dc, 100)
-# hp.create_plot()
+# hp.create_plot(dc)
