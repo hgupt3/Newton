@@ -29,7 +29,7 @@ class reciever():
     # function for processing data from arduino
     def read_data(self): 
         try: recieved, addr = self.sock.recvfrom(1024) # buffer size is 1024 bytes
-        except: self.close('Packet timeout')
+        except: self.close()
         line = recieved.decode('utf-8').strip()
         values = line.split(',')
         for idx in range(len(values)):
@@ -59,6 +59,7 @@ class reciever():
         self.save_data()
          
 # run class   
-rec = reciever(int(sys.argv[1]))
+try: rec = reciever(int(sys.argv[1]))
+except: rec = reciever(5)
 rec.run()
 rec.close()

@@ -65,7 +65,7 @@ class camera():
         cv2.imshow('Camera', self.frame)
         cv2.namedWindow("Camera", cv2.WINDOW_NORMAL) 
         cv2.resizeWindow("Camera", 900, 500)
-        if cv2.waitKey(1) in {ord("q"), ord("Q")}: self.close('close_event')
+        if cv2.waitKey(1) in {ord("q"), ord("Q")}: self.close()
         
         landmarks = process_data(landmarks) * 100
         
@@ -120,6 +120,7 @@ def process_data(unprocessed_landmarks):
     finally: return landmarks
 
 # show camera    
-cam = camera(int(sys.argv[1]))
+try: cam = camera(int(sys.argv[1]))
+except: cam = camera(5)
 cam.run()
 cam.close()
