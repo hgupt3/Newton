@@ -12,7 +12,7 @@ class hand_plot():
         self.ax1 = self.fig.add_subplot(121, projection='3d') # create 3D figure
         self.interval = interval_
         self.ani = FuncAnimation(self.fig, self.update_plot, fargs=(self.data, self.ax,),  
-                                 interval=self.interval, cache_frame_data=False, frames=np.shape(self.data)[0])
+                                 interval=self.interval, cache_frame_data=False, frames=np.shape(self.data1)[0])
 
     # plot configuration
     def create_plot(self):
@@ -24,7 +24,7 @@ class hand_plot():
         self.ax2 = self.fig.add_subplot(122, projection='3d')
         self.ani = FuncAnimation(self.fig, self.update_plot_predict, fargs=(self.data1, self.data2,), 
                                  interval=self.interval, cache_frame_data=False, 
-                                 frames=min(np.shape(self.data)[0], np.shape(self.data_predict)[0]))
+                                 frames=min(np.shape(self.data1)[0], np.shape(self.data2)[0]))
         plt.show()
 
     def update_plot_predict(self, num, df1, df2):
