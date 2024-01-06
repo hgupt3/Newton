@@ -69,6 +69,33 @@ input_test_tensors = Variable(torch.Tensor(np.array(input_test_datasets)))
 output_train_tensors = Variable(torch.Tensor(np.array(output_train_datasets)))
 output_test_tensors = Variable(torch.Tensor(np.array(output_test_datasets)))
 
+class real_time_hand_lstm(nn.Module):
+    def __init__(self):
+        super(real_time_hand_lstm, self).__init__()
+        self.input_dim = 30
+        self.num_layers_lstm = 2
+        self.hidden_size_lstm = 128
+        self.drop_prob_lstm = 0.2
+        self.hidden_size_linear = 84
+        self.output_dim = 63
+        self.h = Variable(torch.zeros(self.num_layers_lstm, 1, self.hidden_size_lstm)) # hidden state
+        self.c = Variable(torch.zeros(self.num_layers_lstm, 1, self.hidden_size_lstm)) # cell state
+
+        self.lstm = nn.LSTM(input_size=self.input_dim, 
+                            hidden_size=self.hidden_size_lstm, 
+                            num_layers=self.num_layers_lstm, 
+                            dropout=self.drop_prob_lstm,
+                            batch_first=True)
+        self.linear = nn.Linear(in_features=self.hidden_size_lstm, 
+                                out_features=self.hidden_size_linear)
+        self.linear_out = nn.Linear(in_features=self.hidden_size_linear, 
+                                    out_features=self.output_dim)
+    def forward(self, x):
+        x, (self.h, self.c) = self.lstm(x, (self.h, self.c)) # final hidden state and cell state not used
+        x = self.linear(x)
+        out = self.linear_out(x)
+        return out
+
 class hand_lstm(nn.Module):
     def __init__(self):
         super(hand_lstm, self).__init__()
