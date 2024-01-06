@@ -11,7 +11,7 @@ class hand_plot():
         self.fig.canvas.manager.set_window_title('Hand Landmark Plot')
         self.ax1 = self.fig.add_subplot(121, projection='3d') # create 3D figure
         self.interval = interval_
-        self.ani = FuncAnimation(self.fig, self.update_plot, fargs=(self.data, self.ax,),  
+        self.ani = FuncAnimation(self.fig, self.update_plot, fargs=(self.data1, self.ax1,),  
                                  interval=self.interval, cache_frame_data=False, frames=np.shape(self.data1)[0])
 
     # plot configuration
@@ -34,7 +34,6 @@ class hand_plot():
     # update plot function which reads frame and displays landmarks
     def update_plot(self, num, df, ax):
         landmarks = []
-        df[num]
         for idx in range(21):
             landmarks.append([df[num][idx*3], df[num][idx*3+1], df[num][idx*3+2]])
             

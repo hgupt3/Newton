@@ -41,7 +41,8 @@ unsigned int recieverPort;
 char packetBuffer[UDP_TX_PACKET_MAX_SIZE]; 
 
 // time variables
-double epoch_time, relative_epoch;
+double epoch_time = 0, relative_epoch = 0;
+bool newton = false;
 
 void setup() {
   
@@ -62,9 +63,10 @@ void loop() {
   
   check_UDP(); // resync time and network info if something is sent
 
+  if (newton) {while (millis() % 100);} // wait for every 100ms
+
   send_data(); // send data through UDP
 
-  // delay(21); // every 50ms
 }
 
 // function to initialize the pins
@@ -169,8 +171,11 @@ bool check_UDP() {
     recieverPort = Udp.remotePort();
     int len = Udp.read(packetBuffer, 255);
     if (len > 0) packetBuffer[len] = 0; // read packet to buffer
-    epoch_time = std::atof(packetBuffer);
-    relative_epoch = static_cast<double>(micros())/1e6;
+    if (packetBuffer[0] == 'R') {newton = true;}
+    else {
+      epoch_time = std::atof(packetBuffer);
+      relative_epoch = static_cast<double>(micros())/1e6;
+    }
   }
   return recieved;
 }
@@ -199,8 +204,8 @@ void send_data() {
   Udp.print(msg);
   Udp.endPacket();
 
-  // Serial.print("Sent packet at ");
-  // Serial.println(time);
+  Serial.print("Sent packet at ");
+  Serial.println(time);
 }
 
 // function to change I2C bus channel

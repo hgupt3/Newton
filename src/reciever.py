@@ -8,7 +8,7 @@ import time
 import os
 import sys
 import torch
-from lstm_model import real_time_hand_lstm, ss_output
+from lstm_model import real_time_hand_lstm, ss_output, ss_input
 from torch.autograd import Variable
 from matplotlib.animation import FuncAnimation
 import matplotlib.pyplot as plt
@@ -36,7 +36,7 @@ class reciever():
         self.ani = FuncAnimation(self.fig, self.create_plot_real_time, interval=1,
                                  cache_frame_data=False)
         
-        self.sock.sendto(bytes('R'), (self.senderIP, self.senderPort))
+        self.sock.sendto(b'R', (self.senderIP, self.senderPort))
         plt.show()
 
     # function for running and gathering datasets (data collection)
@@ -49,14 +49,18 @@ class reciever():
     
     def create_plot_real_time(self, n):
         try: recieved, addr = self.sock.recvfrom(1024) # buffer size is 1024 bytes
-        except: self.close()
+        except: plt.close()
         line = recieved.decode('utf-8').strip()
         values = line.split(',')
-        input_tensor = Variable(torch.Tensor(np.array([[values[1:]]])))
+        for idx, elem in enumerate(values): values[idx] = float(elem)
+            
+        values = ss_input.transform([values[1:]])
+        print(values)
+        input_tensor = Variable(torch.Tensor(np.array([values])))
 
         output = self.model(input_tensor)
         output = output.data.numpy()
-        output = ss_output.inverse_transform(output[0])
+        output = ss_output.inverse_transform(output[0])[0]
         
         landmarks = []
         for idx in range(21):
@@ -140,6 +144,5 @@ class reciever():
          
 # run class   
 try: rec = reciever(int(sys.argv[1]))
-except: rec = reciever(5)
-rec.run()
-rec.close()
+except: rec = reciever(20)
+rec.run_real_time()

@@ -127,7 +127,7 @@ class hand_lstm(nn.Module):
         return out
     
 def train(model, num_epoch, learning_rate):        
-    criterion = torch.nn.MSELoss()
+    criterion = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
     # model training
@@ -173,3 +173,7 @@ def save(model):
         
         do = pd.DataFrame(do)
         do.to_csv(f"data/test_output{idx+1}.csv")
+        
+# model = hand_lstm()
+# model.load_state_dict(torch.load("newton_model/weights.pth"))
+# evaluate(model)
