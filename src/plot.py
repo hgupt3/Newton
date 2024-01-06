@@ -6,10 +6,10 @@ from matplotlib.animation import FuncAnimation
 class hand_plot():
     def __init__(self, df, interval_):
         
-        self.data = df
+        self.data1 = df
         self.fig = plt.figure()
         self.fig.canvas.manager.set_window_title('Hand Landmark Plot')
-        self.ax = self.fig.add_subplot(121, projection='3d') # create 3D figure
+        self.ax1 = self.fig.add_subplot(121, projection='3d') # create 3D figure
         self.interval = interval_
         self.ani = FuncAnimation(self.fig, self.update_plot, fargs=(self.data, self.ax,),  
                                  interval=self.interval, cache_frame_data=False, frames=np.shape(self.data)[0])
@@ -19,24 +19,24 @@ class hand_plot():
         plt.show()
         
     # function to display 2 plots
-    def create_plot_with(self, df_predict):
-        self.data_predict = df_predict
-        self.ax_predict = self.fig.add_subplot(122, projection='3d')
-        self.ani = FuncAnimation(self.fig, self.update_plot_predict, fargs=(self.data, self.data_predict,), 
+    def create_plot_with(self, df):
+        self.data2 = df
+        self.ax2 = self.fig.add_subplot(122, projection='3d')
+        self.ani = FuncAnimation(self.fig, self.update_plot_predict, fargs=(self.data1, self.data2,), 
                                  interval=self.interval, cache_frame_data=False, 
                                  frames=min(np.shape(self.data)[0], np.shape(self.data_predict)[0]))
         plt.show()
 
     def update_plot_predict(self, num, df1, df2):
-        self.update_plot(num, df1, self.ax)
-        self.update_plot(num, df2, self.ax_predict)
+        self.update_plot(num, df1, self.ax1)
+        self.update_plot(num, df2, self.ax2)
 
     # update plot function which reads frame and displays landmarks
     def update_plot(self, num, df, ax):
         landmarks = []
         df[num]
         for idx in range(21):
-            landmarks.append([df[num][idx*3], self.data[num][idx*3+1], self.data[num][idx*3+2]])
+            landmarks.append([df[num][idx*3], df[num][idx*3+1], df[num][idx*3+2]])
             
         # clear axes and set new ones
         ax.clear()
