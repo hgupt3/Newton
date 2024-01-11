@@ -8,15 +8,14 @@ This diagram describes the data flow every 100ms. Sensor data is iteratively col
 
 ![JPEG image-4393-92E7-0C-0](https://github.com/hgupt3/Newton/assets/112455192/ace51bf3-89e6-4b83-b25e-3215baa14e95)
 
-The hardware used in this project includes:
+The hardware used in the Newton Hand prototype includes:
 
 - Arduino MKR WiFi 1010 
 - Arduino MKR Connector Carrier
 - 5x Grove 6-Axis Accelerometer & Gyroscope
 - Grove 8 Channel I2C Multiplexer
 
-![IMG_5843](https://github.com/hgupt3/Newton/assets/112455192/e16d0cf7-ac3d-48d2-a53d-c56efbd2974b)
-
+![IMG_5843](https://github.com/hgupt3/Newton/assets/112455192/2c1abd0d-d2c3-4fc1-8b08-5b747baeec80)
 
 
 
