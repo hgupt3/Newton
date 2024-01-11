@@ -12,7 +12,7 @@ This diagram describes the data flow every 100ms.
 
 Sensor data is iteratively collected through the I2C channel using a multiplexer. The data is wrapped into a UDP packet sent to the server to be processed.
 
-After the data is recieved, unpacked, and processed, the server passes the data through a neural network with a 30 node input layer (6 inputs per sensor), 2 - 128 node LSTM layers, a 84 node linear layer, and a 63 node output layer (xyz coordinates for 21 landmarks). In the LSTM layer, after each iteration, the hidden states and cell states are stored (initial are 0s) and used in the next 100ms cycle. 
+After the data is recieved, unpacked, and processed, the server passes the data through a recurrent neural network with a 30 node input layer (6 inputs per sensor), 2 - 128 node LSTM layers, a 84 node linear layer, and a 63 node output layer (xyz coordinates for 21 landmarks). In the LSTM layer, after each iteration, the hidden states and cell states are stored (initial are 0s) and used in the next 100ms cycle. 
 
 The output landmarks can be used in different applications as demonstrated in https://youtu.be/aYTmjKz988A. 
 
