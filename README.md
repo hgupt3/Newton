@@ -15,8 +15,4 @@ The hardware used in the Newton Hand prototype includes:
 - 5x Grove 6-Axis Accelerometer & Gyroscope
 - Grove 8 Channel I2C Multiplexer
 
-![IMG_5843](https://github.com/hgupt3/Newton/assets/112455192/2c1abd0d-d2c3-4fc1-8b08-5b747baeec80)
-
-
-
-
+![IMG_5843](https://github.com/hgupt3/Newton/assets/112455192/988fcb2b-7af3-4e4e-adfe-a9279b0b5699)
