@@ -1,4 +1,4 @@
-# Newton
+# Newton Hand
 
 Below is a demo of the real-time spatial model created using the Newton Hand:
 
