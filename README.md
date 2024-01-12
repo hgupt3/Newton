@@ -3,7 +3,7 @@
 Below is a demo of the real-time spatial model created using the Newton Hand:
 
 
-<img width="390" alt="0 005" src="https://github.com/hgupt3/Newton/assets/112455192/fdeeb6dc-2994-427f-a9a1-2890a4782db0">
+<img width="500" alt="0 005" src="https://github.com/hgupt3/Newton/assets/112455192/fdeeb6dc-2994-427f-a9a1-2890a4782db0">
 
 
 # Data Flow
@@ -17,13 +17,13 @@ After the data is recieved, unpacked, and processed, the server passes the data 
 The output landmarks can be used in different applications as demonstrated in https://youtu.be/aYTmjKz988A. 
 
 
-![JPEG image-4393-92E7-0C-0](https://github.com/hgupt3/Newton/assets/112455192/ace51bf3-89e6-4b83-b25e-3215baa14e95)
+<img width="500" alt="0 005" src="https://github.com/hgupt3/Newton/assets/112455192/ace51bf3-89e6-4b83-b25e-3215baa14e95">
 
 # Validation
 
 The following diagram shows loss vs epoch of test and train data for a learning rate of 0.005 (Optimizer: Adam / Criterion: MSE). I chose an epoch of 50 to prevent overfitting of the model.
 
-<img width="390" alt="0 005" src="https://github.com/hgupt3/Newton/assets/112455192/1bbad9cd-4fc7-4a7e-8957-1c9af4368a2b">
+<img width="500" alt="0 005" src="https://github.com/hgupt3/Newton/assets/112455192/1bbad9cd-4fc7-4a7e-8957-1c9af4368a2b">
 
 
 # Hardware
@@ -36,4 +36,4 @@ The hardware used in the Newton Hand prototype includes:
 - Grove 8 Channel I2C Multiplexer
 
 
-![IMG_5843](https://github.com/hgupt3/Newton/assets/112455192/5d5d06a6-7e06-4a08-b2e8-408ade828063)
+<img width="500" alt="0 005" src="https://github.com/hgupt3/Newton/assets/112455192/5d5d06a6-7e06-4a08-b2e8-408ade828063">
