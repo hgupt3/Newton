@@ -3,7 +3,9 @@
 Below is a demo of the real-time spatial model created using the Newton Hand:
 
 
-<center><img width="500" alt="Spatial Model GIF" src="https://github.com/hgupt3/Newton/assets/112455192/fdeeb6dc-2994-427f-a9a1-2890a4782db0"></center>
+<div style="text-align: center">
+  <img width="500" alt="Spatial Model GIF" src="https://github.com/hgupt3/Newton/assets/112455192/fdeeb6dc-2994-427f-a9a1-2890a4782db0" align="center">
+</div>
 
 
 # Data Flow
