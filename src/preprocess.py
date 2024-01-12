@@ -72,4 +72,4 @@ while os.path.exists(f'data/reciever{idx}.csv'):
 # dc = dc.to_numpy()
 
 # hp = hand_plot(dc, 100)
-# hp.create_plot(dc)
+# hp.create_plot()
