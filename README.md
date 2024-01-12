@@ -3,7 +3,7 @@
 Below is a demo of the real-time spatial model created using the Newton Hand:
 
 
-![Newton Demo](https://github.com/hgupt3/Newton/assets/112455192/fdeeb6dc-2994-427f-a9a1-2890a4782db0)
+<img width="390" alt="0 005" src="https://github.com/hgupt3/Newton/assets/112455192/fdeeb6dc-2994-427f-a9a1-2890a4782db0">
 
 
 # Data Flow
@@ -18,6 +18,12 @@ The output landmarks can be used in different applications as demonstrated in ht
 
 
 ![JPEG image-4393-92E7-0C-0](https://github.com/hgupt3/Newton/assets/112455192/ace51bf3-89e6-4b83-b25e-3215baa14e95)
+
+# Validation
+
+The following diagram shows loss vs epoch of test and train data for a learning rate of 0.005 (Optimizer: Adam / Criterion: MSE). I chose an epoch of 50 to prevent overfitting of the model.
+
+<img width="390" alt="0 005" src="https://github.com/hgupt3/Newton/assets/112455192/1bbad9cd-4fc7-4a7e-8957-1c9af4368a2b">
 
 
 # Hardware
