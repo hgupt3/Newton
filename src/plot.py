@@ -40,12 +40,11 @@ class hand_plot():
         # clear axes and set new ones
         ax.clear()
         ax.set_box_aspect((1, 1, 0.6), zoom = 1.6) # aspect ratio of graph
-        ax.set_xlabel("x")
-        ax.set_ylabel("y")
-        ax.set_zlabel("z")
         ax.set_xlim3d(-10, 10)
         ax.set_ylim3d(-10, 10)
         ax.set_zlim3d(-10, 10)
+        ax.set_xticklabels([])
+        ax.set_yticklabels([])
         ax.set_zticklabels([])
         ax.view_init(elev=-90, azim=270)
 
@@ -58,11 +57,11 @@ class hand_plot():
         pinky_idx = {18, 19, 20}
 
         for idx in range(len(landmarks)): # print all landmarks
-            if idx in palm_idx: ax.scatter(landmarks[idx][0], landmarks[idx][1], landmarks[idx][2], color='red', edgecolors='white')
-            if idx in thumb_idx: ax.scatter(landmarks[idx][0], landmarks[idx][1], landmarks[idx][2], color='bisque', edgecolors='white')
-            if idx in index_idx: ax.scatter(landmarks[idx][0], landmarks[idx][1], landmarks[idx][2], color='purple', edgecolors='white')
+            if idx in palm_idx: ax.scatter(landmarks[idx][0], landmarks[idx][1], landmarks[idx][2], color='dimgrey', edgecolors='white')
+            if idx in thumb_idx: ax.scatter(landmarks[idx][0], landmarks[idx][1], landmarks[idx][2], color='crimson', edgecolors='white')
+            if idx in index_idx: ax.scatter(landmarks[idx][0], landmarks[idx][1], landmarks[idx][2], color='darkviolet', edgecolors='white')
             if idx in middle_idx: ax.scatter(landmarks[idx][0], landmarks[idx][1], landmarks[idx][2], color='gold', edgecolors='white')
-            if idx in ring_idx: ax.scatter(landmarks[idx][0], landmarks[idx][1], landmarks[idx][2], color='chartreuse', edgecolors='white')
+            if idx in ring_idx: ax.scatter(landmarks[idx][0], landmarks[idx][1], landmarks[idx][2], color='limegreen', edgecolors='white')
             if idx in pinky_idx: ax.scatter(landmarks[idx][0], landmarks[idx][1], landmarks[idx][2], color='royalblue', edgecolors='white')
 
         # create line connections between relevant landmarks
@@ -74,9 +73,9 @@ class hand_plot():
         pinky = np.array([landmarks[17], landmarks[18], landmarks[19], landmarks[20]])
 
         # displayed with colors
-        ax.plot(palm[:,0], palm[:,1], palm[:,2], color='grey')
-        ax.plot(thumb[:,0], thumb[:,1], thumb[:,2], color='bisque')
-        ax.plot(index[:,0], index[:,1], index[:,2], color='purple')
+        ax.plot(palm[:,0], palm[:,1], palm[:,2], color='dimgrey')
+        ax.plot(thumb[:,0], thumb[:,1], thumb[:,2], color='crimson')
+        ax.plot(index[:,0], index[:,1], index[:,2], color='darkviolet')
         ax.plot(middle[:,0], middle[:,1], middle[:,2], color='gold')
-        ax.plot(ring[:,0], ring[:,1], ring[:,2], color='chartreuse')
+        ax.plot(ring[:,0], ring[:,1], ring[:,2], color='limegreen')
         ax.plot(pinky[:,0], pinky[:,1], pinky[:,2], color='royalblue')
