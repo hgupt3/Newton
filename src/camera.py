@@ -40,14 +40,15 @@ class hand_landmarker():
       self.landmarker.close()
     
 class camera():
-    def __init__(self, time_):
+    def __init__(self):
         self.landmarker = hand_landmarker() # create hand landmarker instance
         self.frame, self.ret = None, None
         self.data = []
         
-        self.time = time_ + time.time()
         
-    def run(self):
+        
+    def run(self, time_):
+        self.time = time_ + time.time()
         self.feed = cv2.VideoCapture(0) # try 0 or 1 if you get an error
         self.feed.isOpened()
         
@@ -120,7 +121,7 @@ def process_data(unprocessed_landmarks):
     finally: return landmarks
 
 # show camera    
-try: cam = camera(int(sys.argv[1]))
-except: cam = camera(5)
-cam.run()
+cam = camera()
+# cam.run(int(999)
+cam.run(int(sys.argv[1]))
 cam.close()
