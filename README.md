@@ -8,7 +8,7 @@ Below is a demo of the real-time spatial model created using the Newton Hand:
 </p>
 
 
-# Data Flow
+# Data Pipeline
 
 This diagram describes the data flow every 100ms. 
 
